@@ -16,7 +16,7 @@ issue背后：
 	* 了解mapping代码是针对carrier定制的or通用的，如果是对通用的mapping进行修改，要多测一些carrier。
 	* 根据代码改动的逻辑，去覆盖所有的路径，比如if的条件分支。
 	* 了解transfer方法的结构包括action、module、service。
-	from log： daemonservice\main\src\com\ehi\webconnect
+from log： daemonservice\main\src\com\ehi\webconnect
 	actionId=universal-script-highmark-oec
 	actionModuleClass=com.ehi.webconnect.medicare.integration.outbound.module.HighmarkTransferModule
 	actionClass=com.ehi.webconnect.universaldatatransfer.action.CommonDataTransferAction
