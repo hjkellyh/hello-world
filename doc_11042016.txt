@@ -1,0 +1,37 @@
+参考issue： MEDI-12039
+
+issue背景：Enhancement for the SEP question section (2017)，修改了结点的XPath。页面选项从多选变成单选。
+
+我的business逻辑理解：
+页面填写信息 -> 信息存在xml文件中 -> transfer方法取xml中的信息 -> 成功执行 -> 将结果存在oec文件中 -> 将oec文件发送至FTP
+
+针对issue：
+	* SEP有两种类型，一种带日期，一种不带日期，看代码发现他们都是存在同一个xml结点中，因此可以将此分为两个等价类，只需要走两个case，节约时间。
+	* 在页面上选了SEP后，点击next（触发代码），再查看xml检查是否是想要的结果。
+	* 最理想的做法，找到xml文件的位置，直接修改xml文件中SEP节点的值，自己写一个方法调用transfer的代码，打印查看mapping结果是否正确。
+
+issue背后：
+1.下载daemon service代码：
+	* 具体代码路径在issue的commits里面找
+	* 了解mapping代码是针对carrier定制的or通用的，如果是对通用的mapping进行修改，要多测一些carrier。
+	* 根据代码改动的逻辑，去覆盖所有的路径，比如if的条件分支。
+	* 了解transfer方法的结构包括action、module、service。
+from log： daemonservice\main\src\com\ehi\webconnect
+	actionId=universal-script-highmark-oec
+	actionModuleClass=com.ehi.webconnect.medicare.integration.outbound.module.HighmarkTransferModule
+	actionClass=com.ehi.webconnect.universaldatatransfer.action.CommonDataTransferAction
+daemonservice 代码位置wiki：https://wiki.ehealthinsurance.com/display/MED/Medicare+Environment+Information
+daemonservice 代码下载地址：https://git.ehealthinsurance.com/scm/pci/daemonservice.git
+2.查看action log，有很多路径位置信息、xml信息等等。
+	比如：https://www9.qp.ehealthinsurance.com/ehi/ActionLogFileView.ds?logId=139975277&mcei.app.terminalID=__tid__1_
+	action.context.logFilePath=/archive/WLILogs/daemonService/universal-script-highmark-oec/2016/10/31/action.7wNdrR.log
+3.查看服务器log，可以写一个脚本用来抓取你想要的log（Shell - grab）。
+3.自动化工具：zipcode查找填写；一键登录BO；一键EHM->EHMP
+4.写脚本的目的：长期可重复利用，促使你在过程中思考更多，为后面接手工作的人提供线索。
+5.给sublime小白的快捷键：
+	* 用 Ctrl + P 可以快速跳转到当前项目中的任意文件，可进行关键词匹配。
+	* 用 Ctrl + P 后 @ (或是Ctrl +R)可以快速列出/跳转到某个函数
+	* 用 Ctrl + P 后 # 可以在当前文件中进行搜索。
+	* 用 Ctrl + P 后 : (或是Ctrl+G)加上数字可以跳转到相应的行。
+	* 用 Ctrl +P 加上一些关键词跳转到某个文件同时加上 @ 来列出/跳转到目标文件中的某个函数，或是同时加上 # 来在目标文件中进行搜索，或是同时加上 : 和数字来跳转到目标文件中相应的行。
+	* 按住Ctrl，然后在页面中希望中现光标的位置点击，实现多重选择功能，允许在页面中同时存在多个光标。
